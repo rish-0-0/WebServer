@@ -83,6 +83,17 @@ int main(int argc, char** argv)
 
 	freeaddrinfo(serverInfo);
 
+	/*
+
+
+		THE START OF SENDING AND RECEIVING GET REQUEST AND RESPONSE
+
+
+
+	*/
+
+
+
 	// Close the connection
 
 	close(sockfd);
