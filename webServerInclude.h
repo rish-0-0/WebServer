@@ -1,6 +1,6 @@
 #ifndef WEBSERVERINCLUDE_H
 
-#define SERVER_PORT "80"
+#define SERVER_PORT "8080"
 #define MAX_BUFFER_SIZE 4096
 
 #endif

@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
 	if (p == NULL)
 	{
-		fprintf(stderr, "client: failed to connect");
+		fprintf(stderr, "client: failed to connect\n");
 		exit(2);
 	}
 
