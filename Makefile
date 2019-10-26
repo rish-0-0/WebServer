@@ -1,7 +1,10 @@
-all: server client
-server: webServer.c
-	gcc -o server webServer.c
-client: webClient.c
-	gcc -o client webClient.c
+OBJS=server.o serverQueue.o
+CFLAGS=-lpthread
+
+all: server
+server: $(OBJS)
+	gcc -o $@ $^ $(CFLAGS)
+%.o: %.c
+	gcc -c -o $@ $^
 clean:
-	rm client server
+	rm server
