@@ -13,13 +13,21 @@
 #include <stdbool.h>
 
 #include "webServerInclude.h"
+#include "serverQueue.h"
 
-
+// Thread related initialization
 pthread_t thread_pool[THREAD_POOL_SIZE];
+
+// Making enqueue and dequeue thread safe with mutex locks
+pthread_mutex_t mutex_lock = PTHREAD_MUTEX_INITIALIZER;
+
+// THREAD condition variable for removing inefficiency caused by busy waiting
+pthread_cond_t condition_var = PTHREAD_COND_INITIALIZER;
 
 
 void* get_in_addr(struct sockaddr* sa);
 void* thread_function(void* args);
+void handle_connection(int* p_client);
 
 int main()
 {
@@ -29,7 +37,7 @@ int main()
 
 		WILL BE MAKING A MULTI-THREADED WEB SERVER RUNNING ON 8080 (SERVER_PORT) PORT to avoid superuser priveleges
 
-		HAVE TO SET UP A THREAD POOL (around 35 threads will be fine, SERVER BACKLOG WILL BE AROUND 30 connections)
+		HAVE TO SET UP A THREAD POOL (around 35 threads will be fine, SERVER BACKLOG WILL BE AROUND 100 connections)
 
 		HAVE TO SET UP A LOCK SYSTEM: PREFERABLY MUTEX LOCKS BECAUSE SIMPLICITY
 
@@ -130,13 +138,6 @@ int main()
 
 	printf("Waiting for connections ... \n");
 
-	/*
-
-
-	THE THREAD HANDLING WILL START AFTER SERVER STARTS WAITING FOR CONNECTIONS
-
-
-	*/
 	while (true)
 	{
 		sin_size = sizeof client_addr;
@@ -153,6 +154,16 @@ int main()
 	 	 client_addr_string, sizeof client_addr_string);
 
 		printf("SERVER: connection from %s\n", client_addr_string);
+
+		// Pointer to clientfd
+
+		int* p_client = malloc(sizeof(int));
+		*p_client = clientfd;
+		pthread_mutex_lock(&mutex_lock);
+		enqueue(p_client);
+		pthread_cond_signal(&condition_var);
+		pthread_mutex_unlock(&mutex_lock);
+
 
 		/*
 
@@ -179,5 +190,29 @@ void* get_in_addr(struct sockaddr* sa)
 
 void* thread_function(void* args)
 {
-	return NULL;
+	while(true)
+	{
+		int* p_client;
+		pthread_mutex_lock(&mutex_lock);
+		if ( (p_client = dequeue()) == NULL)
+		{
+			// Only wait if there is no other work on the queue
+			pthread_cond_wait(&condition_var,&mutex_lock);
+			// Once the signal arrives this next line of code will execute
+			// Try again
+			p_client = dequeue();
+		}
+		pthread_mutex_unlock(&mutex_lock);
+
+		if (p_client != NULL)
+		{
+			handle_connection(p_client);
+		}
+	}
+}
+
+void handle_connection(int* p_client)
+{
+	printf("Nice\n");
+	free(p_client);
 }
