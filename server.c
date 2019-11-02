@@ -215,15 +215,6 @@ void* thread_function(void* args)
 
 void handle_connection(int* p_client)
 {
-	// DEFINING BUFFER
-	char BUFFER[MAX_BUFFER_SIZE];
-	if ( (read(*p_client, BUFFER, MAX_BUFFER_SIZE - 1)) == -1 )
-	{
-		perror("read \n");
-	}
-
-	printf("REQUEST:\n");
-	printf("%s\n", BUFFER);
-	// END OF DEFINING BUFFER
+	printf("Thread in use\n");
 	free(p_client);
 }
