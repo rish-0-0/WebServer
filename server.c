@@ -136,14 +136,16 @@ int main()
 		exit(2);
 	}
 
-	printf("Waiting for connections ... \n");
+	printf("Waiting for connections on port %s ... \n", SERVER_PORT);
+
+
 
 	while (true)
 	{
 		sin_size = sizeof client_addr;
 		if ( (clientfd = accept(sockfd, (struct sockaddr*)&client_addr, &sin_size)) == -1 )
 		{
-			perror("accept");
+			perror("accept: connection failed\n");
 			continue;
 		}
 
@@ -213,6 +215,15 @@ void* thread_function(void* args)
 
 void handle_connection(int* p_client)
 {
-	printf("Nice\n");
+	// DEFINING BUFFER
+	char BUFFER[MAX_BUFFER_SIZE];
+	if ( (read(*p_client, BUFFER, MAX_BUFFER_SIZE - 1)) == -1 )
+	{
+		perror("read \n");
+	}
+
+	printf("REQUEST:\n");
+	printf("%s\n", BUFFER);
+	// END OF DEFINING BUFFER
 	free(p_client);
 }

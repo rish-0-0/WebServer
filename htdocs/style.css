@@ -1,0 +1,6 @@
+.main-container {
+	background: #dcdcdc;
+	text-align: center;
+	text-transform: uppercase;
+	transform: skew(-30deg);
+}
