@@ -7,6 +7,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/sendfile.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
@@ -215,6 +216,137 @@ void* thread_function(void* args)
 
 void handle_connection(int* p_client)
 {
-	printf("Thread in use\n");
+	// printf("Thread in use\n");
+	char BUFFER[MAX_BUFFER_SIZE];
+	char RESPONSE[MAX_BUFFER_SIZE];
+	char FILE_BUFFER[MAX_FILE_SIZE];
+
+	if ( (read(*p_client, BUFFER, MAX_BUFFER_SIZE - 1)) == -1)
+	{
+		perror("read\n");
+	}
+
+	char webpage[] = 
+		"HTTP/1.1 200 OK\r\n"
+		"Content-Type: text/html; charset=UTF-8 \r\n\r\n";
+
+	char stylesheet[] = 
+		"HTTP/1.1 200 OK\r\n"
+		"Content-Type: text/css; charset=UTF-8 \r\n\r\n"; 
+
+	char faviconType[] = 
+		"HTTP/1.1 200 OK\r\n"
+		"Content-Type: image/x-icon; charset=UTF-8 \r\n\r\n";
+
+	char jpegType[] = 
+		"HTTP/1.1 200 OK\r\n"
+		"Content-Type: image/jpeg \r\n";
+
+	char serverError[] = 
+		"HTTP/1.1 500 Internal Server Error\r\n";
+
+	/*
+
+		ROUTES
+
+	*/
+
+	// FAVICON.ICO
+	if (!strncmp(BUFFER, "GET /favicon.ico", 16))
+	{
+		FILE* favicon_fp;
+
+		if ( (favicon_fp = fopen("htdocs/favicon.ico","r")) == NULL)
+		{
+			perror("favicon open error\n");
+			if ( (write(*p_client, serverError, sizeof(serverError) - 1)) == -1)
+			{
+				perror("writing server error for favi\n");
+			}
+		}
+		else
+		{
+			if ( (write(*p_client, faviconType, sizeof(faviconType) - 1)) == -1)
+			{
+				perror("writing response header favicon error\n");
+			}
+			fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, favicon_fp);
+			if ( (write(*p_client, FILE_BUFFER, MAX_FILE_SIZE - 1)) == -1)
+			{
+				perror("writing file for favicon\n");
+			}
+
+
+		}
+
+		
+		
+		fclose(favicon_fp);
+	}
+	// STYLE.CSS
+	else if (!strncmp(BUFFER, "GET /style.css", strlen("GET /style.css")))
+	{
+		if ( (write(*p_client, stylesheet, sizeof(stylesheet) - 1)) == -1)
+		{
+			perror("writing stylesheet request header error internal server\n");
+		}
+		FILE* style_fp = fopen("htdocs/style.css", "r");
+		if (style_fp == NULL)
+		{
+			perror("fopen for style\n");
+		}
+		else
+		{
+			fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, style_fp);
+			if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER) - 1)) == -1)
+			{
+				perror("writing file for style.css");
+			}
+		}
+
+		fclose(style_fp);
+	}
+
+	// INDEX.HTML
+	else {
+		if ( (write(*p_client, webpage, sizeof(webpage) -1)) == -1)
+		{
+			perror("write\n");
+		}
+		FILE* index_fp = fopen("htdocs/index.html", "r");
+		if (index_fp == NULL)
+		{
+			perror("fopen for index\n");
+			if ( (write(*p_client, serverError, sizeof(serverError) - 1)) == -1)
+			{
+				perror("responding for index.html with 500\n");
+			}
+
+		}
+		else
+		{
+			fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, index_fp);
+			if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER) - 1)) == -1)
+			{
+				perror("writing file for index\n");
+			}
+		}
+
+		fclose(index_fp);
+
+	}
+
+
+	/*
+
+		END ROUTES
+
+	*/
+
+	close(*p_client);
+
+	printf("Response sent\n");
+
+
 	free(p_client);
 }
