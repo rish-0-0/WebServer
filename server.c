@@ -226,9 +226,16 @@ void handle_connection(int* p_client)
 		perror("read\n");
 	}
 
+	printf("REQUEST\n%s\n", BUFFER);
+	fflush(stdout);
+
 	char webpage[] = 
 		"HTTP/1.1 200 OK\r\n"
 		"Content-Type: text/html; charset=UTF-8 \r\n\r\n";
+
+	char scriptType[] = 
+		"HTTP/1.1 200 OK\r\n"
+		"Content-Type: text/javascript; charset=UTF-8 \r\n\r\n";
 
 	char stylesheet[] = 
 		"HTTP/1.1 200 OK\r\n"
@@ -277,10 +284,7 @@ void handle_connection(int* p_client)
 			}
 
 
-		}
-
-		
-		
+		}	
 		fclose(favicon_fp);
 	}
 	// STYLE.CSS
@@ -308,7 +312,8 @@ void handle_connection(int* p_client)
 	}
 
 	// INDEX.HTML
-	else {
+	else if (!strncmp(BUFFER, "GET / ", strlen("GET / ")))
+	{
 		if ( (write(*p_client, webpage, sizeof(webpage) -1)) == -1)
 		{
 			perror("write\n");
@@ -334,6 +339,34 @@ void handle_connection(int* p_client)
 
 		fclose(index_fp);
 
+	}
+
+	else if (!strncmp(BUFFER, "GET /script.js", strlen("GET /script.js")))
+	{
+		if ( (write(*p_client, scriptType, sizeof(scriptType) - 1)) == -1)
+		{
+			perror("writing response header for script error\n");
+		}
+
+		FILE* script_fp = fopen("htdocs/script.js", "r");
+		if (script_fp == NULL)
+		{
+			perror("fopen for script\n");
+			if ( (write(*p_client, serverError, sizeof(serverError) - 1)) == -1)
+			{
+				perror("responding to bad file_pointer_error 500\n");
+			}
+			else
+			{
+				fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, script_fp);
+				if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER) - 1)) == -1)
+				{
+					perror("writing file for script.js\n");
+				}
+			}
+		}
+
+		fclose(script_fp);
 	}
 
 
