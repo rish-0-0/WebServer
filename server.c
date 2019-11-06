@@ -252,6 +252,9 @@ void handle_connection(int* p_client)
 	char serverError[] = 
 		"HTTP/1.1 500 Internal Server Error\r\n";
 
+	char badRequest[] = 
+		"HTTP/1.1 400 Bad Request\r\n";
+
 	/*
 
 		ROUTES
@@ -302,7 +305,7 @@ void handle_connection(int* p_client)
 		else
 		{
 			fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, style_fp);
-			if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER) - 1)) == -1)
+			if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER))) == -1)
 			{
 				perror("writing file for style.css");
 			}
@@ -331,7 +334,7 @@ void handle_connection(int* p_client)
 		else
 		{
 			fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, index_fp);
-			if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER) - 1)) == -1)
+			if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER))) == -1)
 			{
 				perror("writing file for index\n");
 			}
@@ -343,6 +346,8 @@ void handle_connection(int* p_client)
 
 	else if (!strncmp(BUFFER, "GET /script.js", strlen("GET /script.js")))
 	{
+		printf("NICE\n");
+		fflush(stdout);
 		if ( (write(*p_client, scriptType, sizeof(scriptType) - 1)) == -1)
 		{
 			perror("writing response header for script error\n");
@@ -356,17 +361,30 @@ void handle_connection(int* p_client)
 			{
 				perror("responding to bad file_pointer_error 500\n");
 			}
-			else
+
+		}
+		else
+		{
+			printf("Well, we are here\n");
+			fflush(stdout);
+			fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, script_fp);
+			// printf("SCRIPT.js\n%s\n", FILE_BUFFER);
+			// fflush(stdout);
+			if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER))) == -1)
 			{
-				fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, script_fp);
-				if ( (write(*p_client, FILE_BUFFER, strlen(FILE_BUFFER) - 1)) == -1)
-				{
-					perror("writing file for script.js\n");
-				}
+				perror("writing file for script.js\n");
 			}
 		}
 
 		fclose(script_fp);
+	}
+	// BAD REQUEST ( 400 Response Code)
+	else
+	{
+		if ( (write(*p_client, badRequest, sizeof(badRequest) - 1)) == -1)
+		{
+			perror("writing bad request response message\n");
+		}
 	}
 
 
