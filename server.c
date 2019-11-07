@@ -226,8 +226,8 @@ void handle_connection(int* p_client)
 		perror("read\n");
 	}
 
-	printf("REQUEST\n%s\n", BUFFER);
-	fflush(stdout);
+	// printf("REQUEST\n%s\n", BUFFER);
+	// fflush(stdout);
 
 	char webpage[] = 
 		"HTTP/1.1 200 OK\r\n"
@@ -346,7 +346,6 @@ void handle_connection(int* p_client)
 
 	else if (!strncmp(BUFFER, "GET /script.js", strlen("GET /script.js")))
 	{
-		printf("NICE\n");
 		fflush(stdout);
 		if ( (write(*p_client, scriptType, sizeof(scriptType) - 1)) == -1)
 		{
@@ -365,8 +364,6 @@ void handle_connection(int* p_client)
 		}
 		else
 		{
-			printf("Well, we are here\n");
-			fflush(stdout);
 			fread(FILE_BUFFER, sizeof(char), MAX_FILE_SIZE, script_fp);
 			// printf("SCRIPT.js\n%s\n", FILE_BUFFER);
 			// fflush(stdout);
@@ -396,8 +393,8 @@ void handle_connection(int* p_client)
 
 	close(*p_client);
 
-	printf("Response sent\n");
-
+	printf("Responded\n");
+	fflush(stdout);
 
 	free(p_client);
 }
