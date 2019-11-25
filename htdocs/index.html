@@ -8,34 +8,34 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
 	</head>
 	<body>
-		<div class="row">
-			<div class="container">
-				<div class="alert alert-success" role="alert">
-					<h4 class="alert-heading">Well done!</h4>
-					<p>Successfully working.</p>
-					<hr>
-					<p class="mb-0">Watch for extended html file size. Because buffer is small</p>
+		<div class="section">
+			<div class="row">
+				<div class="col text-center p-3">
+					<div class="container">
+						<form class="">
+							<div class="form-group">
+								<label for="ID">ID</label>
+								<input type="text" class="form-control" id="ID" aria-describedby="IDhelp" placeholder="BITS ID" />
+								<small id="IDhelp" class="form-text text-muted">Enter the BITS ID</small>
+							</div>
+							<button type="button" class="btn btn-primary" onclick="getImage();">Submit</button>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="container p-5">
-				<div class="list-group p-2">
-				  <a href="#" class="list-group-item list-group-item-action active">
-				    One item
-				  </a>
-				  <a href="#" class="list-group-item list-group-item-action">second item</a>
-				  <a href="#" class="list-group-item list-group-item-action">third item</a>
-				  <a href="#" class="list-group-item list-group-item-action">fourth item</a>
-				  <a href="#" class="list-group-item list-group-item-action disabled">fifth item</a>
+		<div class="section">
+			<div class="row">
+				<div class="col text-center" id="image-holder">
+					<div class="alert alert-danger" id="alerts" style="display: none;">Reported!</div>
 				</div>
 			</div>
-		</div>
+		</div>	
 
 
 		<!-- JUST SOME STUFF TO MAKE THE PAGE LOOK BETTER -->
-		<script src="script.js"></script>
+		<script src="script.js"></script>	
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

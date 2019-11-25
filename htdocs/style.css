@@ -2,3 +2,13 @@
 	background: #dcdcdc;
 	text-align: center;
 }
+#ID {
+	max-width: 25%;
+	margin-left: auto;
+	margin-right: auto;
+}
+@media screen and (max-width:786px) {
+	#ID {
+		max-width: 75%;
+	}
+}
