@@ -1,9 +1,8 @@
-OBJS=server.o serverQueue.o
-CFLAGS=-lpthread
+OBJS=server.o
 
 all: server
 server: $(OBJS)
-	gcc -o $@ $^ $(CFLAGS)
+	gcc -o $@ $^
 %.o: %.c
 	gcc -c -o $@ $^
 clean:
